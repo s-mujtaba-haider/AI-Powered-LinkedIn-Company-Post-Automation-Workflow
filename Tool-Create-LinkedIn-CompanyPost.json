@@ -1,0 +1,2234 @@
+{
+  "name": "Tool-Create-LinkedIn-CompanyPost",
+  "nodes": [
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "7623b738-2770-479d-be27-3a78f9f132ff",
+              "leftValue": "={{ $('Webhook').first().json.body.post_type }}",
+              "rightValue": 0,
+              "operator": {
+                "type": "string",
+                "operation": "exists",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        1520,
+        1024
+      ],
+      "id": "70164b2d-a39a-401d-893c-1f58558e3017",
+      "name": "Validate request payload"
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $('Webhook').first().json.body.post_type.toLowerCase() }}",
+                    "rightValue": "text",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    },
+                    "id": "56889f44-d872-484b-926b-5c2e83c1fcd1"
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "text"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "f7313976-e3b6-49ba-bb6f-bbdaec8459c0",
+                    "leftValue": "={{ $('Webhook').first().json.body.post_type.toLowerCase() }}",
+                    "rightValue": "article",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals",
+                      "name": "filter.operator.equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "article"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "a45f90cb-335a-46bf-8602-c91070fdf53f",
+                    "leftValue": "={{ $('Webhook').first().json.body.post_type.toLowerCase() }}",
+                    "rightValue": "image",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals",
+                      "name": "filter.operator.equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "image"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "39fae2bd-b9a9-4f20-8242-f960972bf5af",
+                    "leftValue": "={{ $('Webhook').first().json.body.post_type.toLowerCase() }}",
+                    "rightValue": "video",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals",
+                      "name": "filter.operator.equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "video"
+            }
+          ]
+        },
+        "options": {
+          "fallbackOutput": "extra"
+        }
+      },
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.2,
+      "position": [
+        1728,
+        896
+      ],
+      "id": "df348cd0-87b5-40ee-aaf2-dc0f57e7badb",
+      "name": "Post type",
+      "notesInFlow": true
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.linkedin.com/v2/ugcPosts",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "=Bearer {{ $json.access_token }}"
+            },
+            {
+              "name": "X-Restli-Protocol-Version",
+              "value": "2.0.0"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"author\": \"{{ $('TOOL-Tool-Get-LinkedIn-OwnCompanyDetails').first().json.elements[0].organizationalTarget }}\",\n  \"lifecycleState\": \"DRAFT\",\n  \"specificContent\": {\n    \"com.linkedin.ugc.ShareContent\": {\n      \"shareCommentary\": {\n        \"text\": \"{{ $('Webhook').first().json.body.text }}\"\n      },\n      \"shareMediaCategory\": \"NONE\"\n    }\n  },\n  \"visibility\": {\n    \"com.linkedin.ugc.MemberNetworkVisibility\": \"PUBLIC\"\n  }\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        2752,
+        544
+      ],
+      "id": "69f7db9a-e9e7-4e7e-8e4f-d098e506e86a",
+      "name": "Text post",
+      "notesInFlow": true,
+      "onError": "continueErrorOutput"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.linkedin.com/v2/ugcPosts",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "=Bearer {{ $json.access_token }}"
+            },
+            {
+              "name": "X-Restli-Protocol-Version",
+              "value": "2.0.0"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"author\": \"{{ $('TOOL-Tool-Get-LinkedIn-OwnCompanyDetails1').first().json.elements[0].organizationalTarget }}\",\n  \"lifecycleState\": \"DRAFT\",\n  \"specificContent\": {\n    \"com.linkedin.ugc.ShareContent\": {\n      \"shareCommentary\": {\n        \"text\": \"{{ $('Webhook').first().json.body.text }}\"\n      },\n      \"shareMediaCategory\": \"ARTICLE\",\n      \"media\": [\n        {\n          \"status\": \"READY\",\n          \"originalUrl\": \"{{ $('Webhook').first().json.body.article_media_url }}\",\n          \"title\": {\n            \"text\": \"{{ $('Webhook').first().json.body.article_text }}\"\n          }\n        }\n      ]\n    }\n  },\n  \"visibility\": {\n    \"com.linkedin.ugc.MemberNetworkVisibility\": \"PUBLIC\"\n  }\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        2752,
+        720
+      ],
+      "id": "55fbedba-d626-4f6d-9920-644396dd2610",
+      "name": "Article post",
+      "notesInFlow": true,
+      "onError": "continueErrorOutput"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.linkedin.com/v2/ugcPosts",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "=Bearer {{ $('invoke Tool-Get-LinkedIn-accessToken2').first().json.access_token }}"
+            },
+            {
+              "name": "X-Restli-Protocol-Version",
+              "value": "2.0.0"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"author\": \"{{ $('TOOL-Tool-Get-LinkedIn-OwnCompanyDetails2').first().json.elements[0].organizationalTarget }}\",\n  \"lifecycleState\": \"DRAFT\",\n  \"specificContent\": {\n    \"com.linkedin.ugc.ShareContent\": {\n      \"shareCommentary\": {\n        \"text\": \"{{ $('Webhook').first().json.body.text }}\"\n      },\n      \"shareMediaCategory\": \"IMAGE\",\n      \"media\": [\n        {\n          \"status\": \"READY\",\n          \"media\": \"{{$('Register the Image').first().json.value.asset}}\",\n          \"title\": {\n            \"text\": \"{{ $('Webhook').first().json.body.image_title }}\"\n          }\n        }\n      ]\n    }\n  },\n  \"visibility\": {\n    \"com.linkedin.ugc.MemberNetworkVisibility\": \"PUBLIC\"\n  }\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        3312,
+        896
+      ],
+      "id": "bd29c900-978a-4a61-84e9-21c03c06f3f9",
+      "name": "Image post",
+      "notesInFlow": true,
+      "onError": "continueErrorOutput"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.linkedin.com/v2/ugcPosts",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "=Bearer {{ $('invoke Tool-Get-LinkedIn-accessToken3').first().json.access_token }}"
+            },
+            {
+              "name": "X-Restli-Protocol-Version",
+              "value": "2.0.0"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"author\": \"{{ $('TOOL-Tool-Get-LinkedIn-OwnCompanyDetails3').first().json.elements[0].organizationalTarget }}\",\n  \"lifecycleState\": \"DRAFT\",\n  \"specificContent\": {\n    \"com.linkedin.ugc.ShareContent\": {\n      \"shareCommentary\": {\n        \"text\": \"{{ $('Webhook').first().json.body.text }}\"\n      },\n      \"shareMediaCategory\": \"VIDEO\",\n      \"media\": [\n        {\n          \"status\": \"READY\",\n          \"media\": \"{{$('Register the Video').first().json.value.asset}}\",\n          \"title\": {\n            \"text\": \"{{ $('Webhook').first().json.body.video_title }}\"\n          }\n        }\n      ]\n    }\n  },\n  \"visibility\": {\n    \"com.linkedin.ugc.MemberNetworkVisibility\": \"PUBLIC\"\n  }\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        3312,
+        1072
+      ],
+      "id": "97166cc5-667f-465a-8fda-a250033d9fa7",
+      "name": "Video post",
+      "notesInFlow": true,
+      "onError": "continueErrorOutput"
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "{\n  \"Error\": \"The post type you selected is not supported. Please choose a valid type such as 'text', 'article', 'image', or 'video'.\"\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.4,
+      "position": [
+        1792,
+        1152
+      ],
+      "id": "7101ccbd-9b35-44ce-a46a-b69f94ae874a",
+      "name": "Incorrect post type"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "680cab85-1fed-441c-ad21-c043d7900c37",
+              "leftValue": "={{ $('Webhook').first().json.body.text }}",
+              "rightValue": "",
+              "operator": {
+                "type": "string",
+                "operation": "exists",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        1984,
+        560
+      ],
+      "id": "ded9b5ee-4eec-4ae5-b387-ed595a30a95d",
+      "name": "Validate text post request payload"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "680cab85-1fed-441c-ad21-c043d7900c37",
+              "leftValue": "={{ $('Webhook').first().json.body.text }}",
+              "rightValue": "",
+              "operator": {
+                "type": "string",
+                "operation": "exists",
+                "singleValue": true
+              }
+            },
+            {
+              "id": "14b6886e-8e95-45dd-9c3b-12aed1b06894",
+              "leftValue": "={{ $('Webhook').first().json.body.article_media_url }}",
+              "rightValue": "",
+              "operator": {
+                "type": "string",
+                "operation": "exists",
+                "singleValue": true
+              }
+            },
+            {
+              "id": "83615278-7432-42e0-aa42-6833ce7d8823",
+              "leftValue": "={{ $('Webhook').first().json.body.article_text }}",
+              "rightValue": "",
+              "operator": {
+                "type": "string",
+                "operation": "exists",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        1984,
+        736
+      ],
+      "id": "9daca936-f8cf-45d3-8c77-adb51821a01f",
+      "name": "Validate article post request payload"
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "{\n  \"Error\": \"Your request is missing the required 'text' field. Please include the text content you want to publish in the payload.\"\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.4,
+      "position": [
+        2160,
+        544
+      ],
+      "id": "96613dc6-f4c0-4701-ac4e-f72a4949854b",
+      "name": "Incorrect request payload"
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "{\n  \"Error\": \"To create an article post, you must provide all required fields: 'text', 'article_media_url', and 'article_text'. Please check your request and include the missing values.\"\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.4,
+      "position": [
+        2160,
+        720
+      ],
+      "id": "527f97f3-1497-4e75-a5a2-07e95fafe739",
+      "name": "Incorrect request payload1"
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "{\n  \"Error\": \"To create an image post, you must provide all required fields: 'text', 'image_url', and 'image_title'. Please check your request and include the missing values.\"\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.4,
+      "position": [
+        2160,
+        896
+      ],
+      "id": "e4ddb30c-a08f-4e9d-ab75-38c6ccb36220",
+      "name": "Incorrect request payload2"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.linkedin.com/v2/assets?action=registerUpload",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "=Bearer {{ $json.access_token }}"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n    \"registerUploadRequest\": {\n        \"recipes\": [\n            \"urn:li:digitalmediaRecipe:feedshare-image\"\n        ],\n        \"owner\": \"{{ $('TOOL-Tool-Get-LinkedIn-OwnCompanyDetails2').first().json.elements[0].organizationalTarget }}\",\n        \"serviceRelationships\": [\n            {\n                \"relationshipType\": \"OWNER\",\n                \"identifier\": \"urn:li:userGeneratedContent\"\n            }\n        ]\n    }\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        2752,
+        896
+      ],
+      "id": "de7bbf86-18cd-449d-a330-0739481cc856",
+      "name": "Register the Image",
+      "notesInFlow": true,
+      "onError": "continueErrorOutput"
+    },
+    {
+      "parameters": {
+        "url": "={{ $('Webhook').first().json.body.image_url }}",
+        "options": {
+          "response": {
+            "response": {
+              "responseFormat": "file"
+            }
+          }
+        }
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        2928,
+        896
+      ],
+      "id": "97af93b3-28fb-4b7e-95f7-f2f1d8368c04",
+      "name": "Get image binary data",
+      "notesInFlow": true,
+      "onError": "continueErrorOutput"
+    },
+    {
+      "parameters": {
+        "method": "PUT",
+        "url": "={{ $json.value.uploadMechanism[\"com.linkedin.digitalmedia.uploading.MediaUploadHttpRequest\"].uploadUrl }}",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "=Bearer {{ $json.access_token }}"
+            }
+          ]
+        },
+        "sendBody": true,
+        "contentType": "binaryData",
+        "inputDataFieldName": "data",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        3120,
+        896
+      ],
+      "id": "b22d6d99-95ff-4db9-a859-e80fa72474bc",
+      "name": "Upload image",
+      "onError": "continueErrorOutput"
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "{\n  \"Error\": \"To create a video post, you must provide all required fields: 'text', 'video_url', and 'video_title'. Please check your request and include the missing values.\"\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.4,
+      "position": [
+        2160,
+        1072
+      ],
+      "id": "24a0a870-35b5-4ce7-82d2-7365c4331766",
+      "name": "Incorrect request payload3"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "680cab85-1fed-441c-ad21-c043d7900c37",
+              "leftValue": "={{ $('Webhook').first().json.body.text }}",
+              "rightValue": "",
+              "operator": {
+                "type": "string",
+                "operation": "exists",
+                "singleValue": true
+              }
+            },
+            {
+              "id": "14b6886e-8e95-45dd-9c3b-12aed1b06894",
+              "leftValue": "={{ $('Webhook').first().json.body.video_url }}",
+              "rightValue": "",
+              "operator": {
+                "type": "string",
+                "operation": "exists",
+                "singleValue": true
+              }
+            },
+            {
+              "id": "83615278-7432-42e0-aa42-6833ce7d8823",
+              "leftValue": "={{ $('Webhook').first().json.body.video_title }}",
+              "rightValue": "",
+              "operator": {
+                "type": "string",
+                "operation": "exists",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        2000,
+        1088
+      ],
+      "id": "e7137fd7-47ab-45de-bb02-9b26091459ba",
+      "name": "Validate video post request payload"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "680cab85-1fed-441c-ad21-c043d7900c37",
+              "leftValue": "={{ $('Webhook').first().json.body.text }}",
+              "rightValue": "",
+              "operator": {
+                "type": "string",
+                "operation": "exists",
+                "singleValue": true
+              }
+            },
+            {
+              "id": "14b6886e-8e95-45dd-9c3b-12aed1b06894",
+              "leftValue": "={{ $('Webhook').first().json.body.image_url }}",
+              "rightValue": "",
+              "operator": {
+                "type": "string",
+                "operation": "exists",
+                "singleValue": true
+              }
+            },
+            {
+              "id": "83615278-7432-42e0-aa42-6833ce7d8823",
+              "leftValue": "={{ $('Webhook').first().json.body.image_title }}",
+              "rightValue": "",
+              "operator": {
+                "type": "string",
+                "operation": "exists",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        1984,
+        912
+      ],
+      "id": "8eef0ebd-23d8-4d82-8137-c61d3e7dbf5c",
+      "name": "Validate image post request payload"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.linkedin.com/v2/assets?action=registerUpload",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "=Bearer {{ $json.access_token }}"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n    \"registerUploadRequest\": {\n        \"recipes\": [\n            \"urn:li:digitalmediaRecipe:feedshare-image\"\n        ],\n        \"owner\": \"{{ $('TOOL-Tool-Get-LinkedIn-OwnCompanyDetails3').first().json.elements[0].organizationalTarget }}\",\n        \"serviceRelationships\": [\n            {\n                \"relationshipType\": \"OWNER\",\n                \"identifier\": \"urn:li:userGeneratedContent\"\n            }\n        ]\n    }\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        2752,
+        1072
+      ],
+      "id": "b62199b6-b166-4407-94ae-1dbb0e38f154",
+      "name": "Register the Video",
+      "notesInFlow": true,
+      "onError": "continueErrorOutput"
+    },
+    {
+      "parameters": {
+        "url": "={{ $('Webhook').first().json.body.video_url }}",
+        "options": {
+          "response": {
+            "response": {
+              "responseFormat": "file"
+            }
+          }
+        }
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        2928,
+        1072
+      ],
+      "id": "16e00511-d102-47b9-8569-d9b5f078d233",
+      "name": "Get video binary data",
+      "notesInFlow": true,
+      "onError": "continueErrorOutput"
+    },
+    {
+      "parameters": {
+        "method": "PUT",
+        "url": "={{ $json.value.uploadMechanism[\"com.linkedin.digitalmedia.uploading.MediaUploadHttpRequest\"].uploadUrl }}",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "=Bearer {{ $json.access_token }}"
+            }
+          ]
+        },
+        "sendBody": true,
+        "contentType": "binaryData",
+        "inputDataFieldName": "data",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        3120,
+        1072
+      ],
+      "id": "a839ed6d-6b85-4746-afc3-f1357d623dd1",
+      "name": "Upload video",
+      "onError": "continueErrorOutput"
+    },
+    {
+      "parameters": {
+        "content": "## This workflow automates publishing posts to a LinkedIn Organization Page via the LinkedIn API.\nIt supports four post types: Text, Article, Image, and Video.\nIncoming requests are validated via a Webhook trigger, processed based on post_type, and then routed through LinkedIn’s ugcPosts API using the organization URN (urn:li:organization:{id}).\n\n## 🔹 Steps Breakdown\n1. Webhook (Trigger)\nEndpoint receives incoming POST request.\nExtracts request body containing:\npost_type (text, article, image, video)\nOther fields depending on type (text, media URL, title, etc.).\n\n2. Validate Request Payload\nEnsures post_type exists in the incoming request.\nIf missing → returns Incorrect request payload response.\n\n3. Switch: Post Type\nRoutes workflow to one of the supported post types:\ntext → Text post branch\narticle → Article post branch\nimage → Image post branch\nvideo → Video post branch\nIf invalid → returns Incorrect post type response.\n\n## 🔹 Post Type Branches\n3.1 Text Post\nValidation: Checks if text field exists.\nOrganization Lookup: Fetches organization URN where user is ADMINISTRATOR.\nPost Creation: Sends POST request to /ugcPosts with:\nauthor = urn:li:organization:{id}\nshareCommentary.text = request text\nshareMediaCategory = NONE\nResponse: Success or error returned to client.\n\n3.2 Article Post\nValidation: Requires text, article_media_url, article_title.\nOrganization Lookup: Gets organization URN.\nPost Creation: Sends POST request with:\nshareMediaCategory = ARTICLE\nmedia = article link & title\nResponse: Success message returned.\n\n3.3 Image Post\nValidation: Requires text, image_url, image_title.\nOrganization Lookup: Gets organization URN.\nRegister Upload: Calls POST /assets?action=registerUpload with organization as owner.\nGet Binary: Downloads image from given URL.\nUpload: PUT request to LinkedIn upload URL with binary image.\nCreate Post: Sends POST /ugcPosts with:\nshareMediaCategory = IMAGE\nmedia = uploaded asset ID\nResponse: Success message returned.\n\n3.4 Video Post\nValidation: Requires text, video_url, video_title.\nOrganization Lookup: Gets organization URN.\nRegister Upload: Calls POST /assets?action=registerUpload for video asset.\nGet Binary: Downloads video file.\nUpload: PUT request to LinkedIn upload URL with binary video.\nCreate Post: Sends POST /ugcPosts with:\nshareMediaCategory = VIDEO\nmedia = uploaded asset ID\nResponse: Success message returned.",
+        "height": 1376,
+        "width": 3232
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        640,
+        32
+      ],
+      "id": "2b363677-4946-489c-877c-6083078d617e",
+      "name": "Sticky Note1"
+    },
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "20b2c035-dbc7-45f0-b6e2-6f45f877256e",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [
+        1328,
+        1024
+      ],
+      "id": "818b3104-8ff8-44cb-abdf-aace5ea98383",
+      "name": "Webhook",
+      "webhookId": "20b2c035-dbc7-45f0-b6e2-6f45f877256e"
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={\n  \"message\":\"Text post created successfully.\",\n  \"postDetails\": {\n    \"urn_number\": \"{{ $json.id }}\",\n    \"text\": {{ JSON.stringify($('Webhook').first().json.body.text) }}\n  }\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.4,
+      "position": [
+        2960,
+        528
+      ],
+      "id": "7ea91c94-0b8f-477e-a088-5ec6d7cca593",
+      "name": "Text post created successfully"
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={\n  \"message\":\"Article post created successfully.\",\n  \"postDetails\": {\n    \"urn_number\": \"{{ $json.id }}\",\n     \"originalUrl\": \"{{ $('Webhook').first().json.body.article_media_url }}\",\n          \"title\": {\n            \"text\": {{ JSON.stringify($('Webhook').first().json.body.article_text) }}\n          }\n  }\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.4,
+      "position": [
+        2960,
+        720
+      ],
+      "id": "6db2fb35-e261-4c72-bcf9-0d1e7287ab83",
+      "name": "Article post created successfully"
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={\n  \"message\":\"Image post created successfully.\",\n   \"postDetails\": {\n    \"urn_number\": \"{{ $json.id }}\",\n        \"text\": {{ JSON.stringify($('Webhook').first().json.body.text) }},\n         \"media\": \"{{ $('Webhook').first().json.body.image_url }}\",\n          \"media_title\": {\n            \"text\": {{ JSON.stringify($('Webhook').first().json.body.image_title) }}\n          }\n  }\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.4,
+      "position": [
+        3520,
+        880
+      ],
+      "id": "e894ca3e-44f1-46f5-a4e5-3fa4e4129ddf",
+      "name": "Image post created successfully"
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={\n  \"message\":\"Video post created successfully.\",\n  \"postDetails\": {\n    \"urn_number\": \"{{ $json.id }}\",\n        \"text\": {{ JSON.stringify($('Webhook').first().json.body.text) }},\n         \"media\": \"{{ $('Webhook').first().json.body.video_url }}\",\n          \"media_title\": {\n            \"text\":{{ JSON.stringify($('Webhook').first().json.body.video_title) }}\n          }\n  }\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.4,
+      "position": [
+        3520,
+        1056
+      ],
+      "id": "04c7d7f0-58b1-4052-896b-7479dd989b86",
+      "name": "Video post created successfully"
+    },
+    {
+      "parameters": {
+        "content": "",
+        "height": 832,
+        "width": 2576,
+        "color": 5
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        1264,
+        480
+      ],
+      "id": "d5440e81-d6e1-4522-8dc5-339cab974e78",
+      "name": "Sticky Note"
+    },
+    {
+      "parameters": {
+        "content": "# Automate LinkedIn Company Posts Integration",
+        "height": 80,
+        "width": 896,
+        "color": 3
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        1920,
+        384
+      ],
+      "id": "1d4d3135-20a0-4e54-b896-2ca4aa15ce0b",
+      "name": "Sticky Note2"
+    },
+    {
+      "parameters": {
+        "url": "https://n8n.c1m.ai/webhook/685ac759-8ae2-47b2-bd85-9fc69b44ebb1",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        2384,
+        544
+      ],
+      "id": "5a3a082a-43f0-4ed1-ba0e-1426acf30640",
+      "name": "TOOL-Tool-Get-LinkedIn-OwnCompanyDetails",
+      "notesInFlow": true,
+      "onError": "continueErrorOutput"
+    },
+    {
+      "parameters": {
+        "url": "https://n8n.c1m.ai/webhook/685ac759-8ae2-47b2-bd85-9fc69b44ebb1",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        2384,
+        720
+      ],
+      "id": "83900540-1c41-48c5-a1da-b5c4ef07326a",
+      "name": "TOOL-Tool-Get-LinkedIn-OwnCompanyDetails1",
+      "notesInFlow": true,
+      "onError": "continueErrorOutput"
+    },
+    {
+      "parameters": {
+        "url": "https://n8n.c1m.ai/webhook/685ac759-8ae2-47b2-bd85-9fc69b44ebb1",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        2384,
+        896
+      ],
+      "id": "25ab0a91-e6da-46d0-be9c-d9e90dea8f4f",
+      "name": "TOOL-Tool-Get-LinkedIn-OwnCompanyDetails2",
+      "notesInFlow": true,
+      "onError": "continueErrorOutput"
+    },
+    {
+      "parameters": {
+        "url": "https://n8n.c1m.ai/webhook/685ac759-8ae2-47b2-bd85-9fc69b44ebb1",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        2384,
+        1072
+      ],
+      "id": "a62c1c9d-5235-4e2a-8d77-97f1543cacb1",
+      "name": "TOOL-Tool-Get-LinkedIn-OwnCompanyDetails3",
+      "notesInFlow": true,
+      "onError": "continueErrorOutput"
+    },
+    {
+      "parameters": {
+        "url": "https://n8n.c1m.ai/webhook/92a381cb-b74e-45f2-b94e-b69e55e550f2",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        2576,
+        544
+      ],
+      "id": "3695a73a-06bd-4a40-97c4-ceb99ea2c713",
+      "name": "invoke Tool-Get-LinkedIn-accessToken",
+      "notesInFlow": true,
+      "onError": "continueErrorOutput"
+    },
+    {
+      "parameters": {
+        "url": "https://n8n.c1m.ai/webhook/92a381cb-b74e-45f2-b94e-b69e55e550f2",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        2576,
+        720
+      ],
+      "id": "3ce82dbf-312c-4ee9-8d58-c47616a3e569",
+      "name": "invoke Tool-Get-LinkedIn-accessToken1",
+      "notesInFlow": true,
+      "onError": "continueErrorOutput"
+    },
+    {
+      "parameters": {
+        "url": "https://n8n.c1m.ai/webhook/92a381cb-b74e-45f2-b94e-b69e55e550f2",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        2576,
+        896
+      ],
+      "id": "bac7343e-2cc8-4fb8-bde6-4e2abda88c52",
+      "name": "invoke Tool-Get-LinkedIn-accessToken2",
+      "notesInFlow": true,
+      "onError": "continueErrorOutput"
+    },
+    {
+      "parameters": {
+        "url": "https://n8n.c1m.ai/webhook/92a381cb-b74e-45f2-b94e-b69e55e550f2",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        2576,
+        1072
+      ],
+      "id": "34c7bc37-947e-446f-a87a-f9184fe9dfa2",
+      "name": "invoke Tool-Get-LinkedIn-accessToken3",
+      "notesInFlow": true,
+      "onError": "continueErrorOutput"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "12585a9c-670a-4899-8942-7e5475032f34",
+              "name": "executionState",
+              "value": "=Start",
+              "type": "string"
+            },
+            {
+              "id": "3abe7a8f-f926-48bd-ba76-620e4051c5bf",
+              "name": "metaData",
+              "value": "={executedNode :'Webhook'}",
+              "type": "string"
+            },
+            {
+              "id": "dc3cc9d1-2ede-410c-8475-da0aa153e61d",
+              "name": "=body",
+              "value": "={message: 'Flow started', body: {{ JSON.stringify($json) }}}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        1456,
+        1424
+      ],
+      "id": "afd19827-b1a4-4dac-869b-6159fea38eb6",
+      "name": "Start execution"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://admin.n8n.c1m.ai/webhook/7fd5766d-c2de-47c5-8e5a-df80535a7ad3",
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "data",
+              "value": "={{ $json }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        4096,
+        1424
+      ],
+      "id": "c3adf872-4ea8-454a-ba8e-ef4168540bed",
+      "name": "Invoke TOOL-LogEvent",
+      "notesInFlow": true,
+      "disabled": true,
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "jsCode": "return {\n  propertyId: 188375,\n  serviceId: $workflow.id,\n  serviceName: \"Tool-Create-LinkedIn-CompanyPost\",\n  executionDatetime: new Date().getTime(),\n  executionId: $execution.id,\n  executionState: $input.first().json.executionState,\n  data: JSON.stringify({\n    type: $input.first().json.executionState,\n    content: $input.first().json.body || {}\n  }),\n  metadata: $input.first().json.metaData,\n  workflowCreator: \"ppatel@c1m.ai\"\n}"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        3952,
+        1424
+      ],
+      "id": "b7fc5119-f1da-49cf-ba98-b198d3922302",
+      "name": "Prepare payload for TOOL-LogEvent",
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.noOp",
+      "typeVersion": 1,
+      "position": [
+        4256,
+        1424
+      ],
+      "id": "83c6bdb3-140f-4e6b-b5da-883d775c52c5",
+      "name": "No Operation, do nothing1"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "12585a9c-670a-4899-8942-7e5475032f34",
+              "name": "executionState",
+              "value": "=Warn",
+              "type": "string"
+            },
+            {
+              "id": "3abe7a8f-f926-48bd-ba76-620e4051c5bf",
+              "name": "metaData",
+              "value": "={exectedNode:'Incorrect post type'}",
+              "type": "string"
+            },
+            {
+              "id": "dc3cc9d1-2ede-410c-8475-da0aa153e61d",
+              "name": "=body",
+              "value": "={message: 'Incorrect post type', body:{{ JSON.stringify($json) }}}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        1904,
+        1424
+      ],
+      "id": "dc2453d0-2530-4bbf-8763-cc42cada23aa",
+      "name": "Incorrect post type1"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "12585a9c-670a-4899-8942-7e5475032f34",
+              "name": "executionState",
+              "value": "=Warn",
+              "type": "string"
+            },
+            {
+              "id": "3abe7a8f-f926-48bd-ba76-620e4051c5bf",
+              "name": "metaData",
+              "value": "={executedNode:'Incorrect request payload'}",
+              "type": "string"
+            },
+            {
+              "id": "dc3cc9d1-2ede-410c-8475-da0aa153e61d",
+              "name": "=body",
+              "value": "={message: 'Incorrect request payload', body:{{ JSON.stringify($json) }}}",
+              "type": "string"
+            },
+            {
+              "id": "6332232b-cf0a-4736-b443-efc10169d295",
+              "name": "",
+              "value": "",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        2272,
+        1424
+      ],
+      "id": "7a926a5d-1878-4b10-845f-06f14d410441",
+      "name": "Incorrect request payload4"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "12585a9c-670a-4899-8942-7e5475032f34",
+              "name": "executionState",
+              "value": "=Error",
+              "type": "string"
+            },
+            {
+              "id": "3abe7a8f-f926-48bd-ba76-620e4051c5bf",
+              "name": "metaData",
+              "value": "={executedNode:'invoke Tool-Get-LinkedIn-accessToken'}",
+              "type": "string"
+            },
+            {
+              "id": "dc3cc9d1-2ede-410c-8475-da0aa153e61d",
+              "name": "=body",
+              "value": "={message: 'Unable to get LinkedIn access token', body:{{ JSON.stringify($json) }}}",
+              "type": "string"
+            },
+            {
+              "id": "6332232b-cf0a-4736-b443-efc10169d295",
+              "name": "",
+              "value": "",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        2688,
+        1424
+      ],
+      "id": "a86fa319-90a2-418c-807e-a923f1e6029b",
+      "name": "Unable to get LinkedIn access token"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "12585a9c-670a-4899-8942-7e5475032f34",
+              "name": "executionState",
+              "value": "=Error",
+              "type": "string"
+            },
+            {
+              "id": "3abe7a8f-f926-48bd-ba76-620e4051c5bf",
+              "name": "metaData",
+              "value": "={executedNode:'Unable to post the text/article or unable to register image/video'}",
+              "type": "string"
+            },
+            {
+              "id": "dc3cc9d1-2ede-410c-8475-da0aa153e61d",
+              "name": "=body",
+              "value": "={message: 'Unable to post the text/article or unable to register image/video', body:{{ JSON.stringify($json) }}}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        2864,
+        1424
+      ],
+      "id": "42ae297b-ee65-4c30-9cbf-2d06b38ebc2b",
+      "name": "Unable to post the text/article or unable to register image/video"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "12585a9c-670a-4899-8942-7e5475032f34",
+              "name": "executionState",
+              "value": "=Error",
+              "type": "string"
+            },
+            {
+              "id": "3abe7a8f-f926-48bd-ba76-620e4051c5bf",
+              "name": "metaData",
+              "value": "={executedNode:'Unable to get image/video'}",
+              "type": "string"
+            },
+            {
+              "id": "dc3cc9d1-2ede-410c-8475-da0aa153e61d",
+              "name": "=body",
+              "value": "={message: 'Unable to get image/video', body:{{ JSON.stringify($json) }}}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        3040,
+        1424
+      ],
+      "id": "bf41e10f-bced-4796-a9ba-548661882cce",
+      "name": "Unable to get image/video"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "12585a9c-670a-4899-8942-7e5475032f34",
+              "name": "executionState",
+              "value": "=Error",
+              "type": "string"
+            },
+            {
+              "id": "3abe7a8f-f926-48bd-ba76-620e4051c5bf",
+              "name": "metaData",
+              "value": "={executedNode:'Unable to upload image/video'}",
+              "type": "string"
+            },
+            {
+              "id": "dc3cc9d1-2ede-410c-8475-da0aa153e61d",
+              "name": "=body",
+              "value": "={message: 'Unable to upload image/video', body:{{ JSON.stringify($json) }}}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        3232,
+        1424
+      ],
+      "id": "6ffc7d36-3aa5-4c0f-8c29-13d06a5dc6f0",
+      "name": "Unable to upload image/video"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "12585a9c-670a-4899-8942-7e5475032f34",
+              "name": "executionState",
+              "value": "=Error",
+              "type": "string"
+            },
+            {
+              "id": "3abe7a8f-f926-48bd-ba76-620e4051c5bf",
+              "name": "metaData",
+              "value": "={executedNode:'Unable to post image/video'}",
+              "type": "string"
+            },
+            {
+              "id": "dc3cc9d1-2ede-410c-8475-da0aa153e61d",
+              "name": "=body",
+              "value": "={message: 'Unable to post image/video', body:{{ JSON.stringify($json) }}}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        3424,
+        1424
+      ],
+      "id": "25892a39-e4fb-4276-86ba-6529b0457e68",
+      "name": "Unable to post image/video"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "12585a9c-670a-4899-8942-7e5475032f34",
+              "name": "executionState",
+              "value": "=Complete",
+              "type": "string"
+            },
+            {
+              "id": "3abe7a8f-f926-48bd-ba76-620e4051c5bf",
+              "name": "metaData",
+              "value": "={executedNode:'Post created Successfully'}",
+              "type": "string"
+            },
+            {
+              "id": "dc3cc9d1-2ede-410c-8475-da0aa153e61d",
+              "name": "=body",
+              "value": "={message: 'Post created Successfully', body:{{ JSON.stringify($json) }}}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        3520,
+        592
+      ],
+      "id": "8393509e-1645-4444-ba40-e0d9a24db74b",
+      "name": "Post created Successfully"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "12585a9c-670a-4899-8942-7e5475032f34",
+              "name": "executionState",
+              "value": "=Error",
+              "type": "string"
+            },
+            {
+              "id": "3abe7a8f-f926-48bd-ba76-620e4051c5bf",
+              "name": "metaData",
+              "value": "={executedNode:'TOOL-Tool-Get-LinkedIn-OwnCompanyDetails'}",
+              "type": "string"
+            },
+            {
+              "id": "dc3cc9d1-2ede-410c-8475-da0aa153e61d",
+              "name": "=body",
+              "value": "={message: 'Unable to get Own Company LinkedIn details', body:{{ JSON.stringify($json) }}}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        2496,
+        1424
+      ],
+      "id": "ff5fdc23-78ad-411b-9f37-aa6f8a894e37",
+      "name": "Unable to get Own Company LinkedIn details"
+    },
+    {
+      "parameters": {
+        "content": "## Log Event Workflow\n\n**1. Prepare Payload for TOOL‑LogEvent**\n\n* Uses a **Code node** (`Prepare payload for TOOL‑LogEvent`) to build a structured JSON payload that includes metadata like workflow ID, execution info, custom data, and request body details.\n\n**2. Invoke TOOL‑LogEvent**\n\n* Uses an **HTTP Request node** (`Invoke TOOL‑LogEvent`) to send that payload as a **POST** request to an external webhook endpoint for logging or monitoring.\n* Both nodes are configured with `onError: continueRegularOutput`, ensuring the workflow continues even if errors occur.\n\n### **Purpose and Flow**\n\n* The first node gathers and formats key execution data.\n* The second node transmits this data to a remote logging endpoint.\n* This setup facilitates **automated logging** while maintaining workflow resilience.\n",
+        "height": 704,
+        "width": 496
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        3904,
+        880
+      ],
+      "typeVersion": 1,
+      "id": "1ba58696-2891-498a-ad77-97a50b376ebc",
+      "name": "Sticky Note12"
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={\n  \"Error\":\"Duplicate Post Detected\"\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.4,
+      "position": [
+        4144,
+        672
+      ],
+      "id": "cec4cf9f-7d1e-4bff-87cc-0ba62b72f58d",
+      "name": "Text post created successfully1"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "e0355746-215d-4221-93d6-eacd41440ee9",
+              "leftValue": "={{ $json.error.message.includes('duplicate') }}",
+              "rightValue": "",
+              "operator": {
+                "type": "boolean",
+                "operation": "true",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        3920,
+        688
+      ],
+      "id": "7eb47866-0af5-4b6b-8ed9-413da8de94f1",
+      "name": "If"
+    }
+  ],
+  "pinData": {
+    "Webhook": [
+      {
+        "json": {
+          "headers": {
+            "host": "n8n.c1m.ai",
+            "x-real-ip": "54.200.45.237",
+            "x-forwarded-for": "54.200.45.237",
+            "x-forwarded-proto": "https",
+            "connection": "upgrade",
+            "content-length": "365",
+            "accept": "application/json,text/html,application/xhtml+xml,application/xml,text/*;q=0.9, image/*;q=0.8, */*;q=0.7",
+            "content-type": "application/json",
+            "user-agent": "axios/1.8.3",
+            "accept-encoding": "gzip, compress, deflate, br"
+          },
+          "params": {},
+          "query": {},
+          "body": {
+            "text": "Test Company Post",
+            "post_type": "Text",
+            "article_media_url": "",
+            "article_text": "",
+            "image_url": "https://png.pngtree.com/png-vector/20190119/ourmid/pngtree-interpretation-meeting-data-data-analysis-analysis-conference-png-image_479127.jpg",
+            "image_title": "Our Team at the Annual Summit",
+            "video_url": "",
+            "video_title": ""
+          },
+          "webhookUrl": "https://n8n.c1m.ai/webhook/20b2c035-dbc7-45f0-b6e2-6f45f877256e",
+          "executionMode": "production"
+        }
+      }
+    ]
+  },
+  "connections": {
+    "Validate request payload": {
+      "main": [
+        [
+          {
+            "node": "Post type",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Incorrect post type",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Post type": {
+      "main": [
+        [
+          {
+            "node": "Validate text post request payload",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Validate article post request payload",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Validate image post request payload",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Validate video post request payload",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Incorrect post type",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Text post": {
+      "main": [
+        [
+          {
+            "node": "Text post created successfully",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Unable to post the text/article or unable to register image/video",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "If",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Article post": {
+      "main": [
+        [
+          {
+            "node": "Article post created successfully",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Unable to post the text/article or unable to register image/video",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "If",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Image post": {
+      "main": [
+        [
+          {
+            "node": "Image post created successfully",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Unable to post image/video",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "If",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Video post": {
+      "main": [
+        [
+          {
+            "node": "Video post created successfully",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Unable to post image/video",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "If",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Validate text post request payload": {
+      "main": [
+        [
+          {
+            "node": "TOOL-Tool-Get-LinkedIn-OwnCompanyDetails",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Incorrect request payload",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Validate article post request payload": {
+      "main": [
+        [
+          {
+            "node": "TOOL-Tool-Get-LinkedIn-OwnCompanyDetails1",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Incorrect request payload1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Register the Image": {
+      "main": [
+        [
+          {
+            "node": "Get image binary data",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Unable to post the text/article or unable to register image/video",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get image binary data": {
+      "main": [
+        [
+          {
+            "node": "Upload image",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Unable to get image/video",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Upload image": {
+      "main": [
+        [
+          {
+            "node": "Image post",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Unable to upload image/video",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Validate video post request payload": {
+      "main": [
+        [
+          {
+            "node": "TOOL-Tool-Get-LinkedIn-OwnCompanyDetails3",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Incorrect request payload3",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Validate image post request payload": {
+      "main": [
+        [
+          {
+            "node": "TOOL-Tool-Get-LinkedIn-OwnCompanyDetails2",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Incorrect request payload2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Register the Video": {
+      "main": [
+        [
+          {
+            "node": "Get video binary data",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Unable to post the text/article or unable to register image/video",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get video binary data": {
+      "main": [
+        [
+          {
+            "node": "Upload video",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Unable to get image/video",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Upload video": {
+      "main": [
+        [
+          {
+            "node": "Video post",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Unable to upload image/video",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "Validate request payload",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Start execution",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "TOOL-Tool-Get-LinkedIn-OwnCompanyDetails": {
+      "main": [
+        [
+          {
+            "node": "invoke Tool-Get-LinkedIn-accessToken",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Unable to get Own Company LinkedIn details",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "TOOL-Tool-Get-LinkedIn-OwnCompanyDetails1": {
+      "main": [
+        [
+          {
+            "node": "invoke Tool-Get-LinkedIn-accessToken1",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Unable to get Own Company LinkedIn details",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "TOOL-Tool-Get-LinkedIn-OwnCompanyDetails2": {
+      "main": [
+        [
+          {
+            "node": "invoke Tool-Get-LinkedIn-accessToken2",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Unable to get Own Company LinkedIn details",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "TOOL-Tool-Get-LinkedIn-OwnCompanyDetails3": {
+      "main": [
+        [
+          {
+            "node": "invoke Tool-Get-LinkedIn-accessToken3",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Unable to get Own Company LinkedIn details",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "invoke Tool-Get-LinkedIn-accessToken": {
+      "main": [
+        [
+          {
+            "node": "Text post",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Unable to get LinkedIn access token",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "invoke Tool-Get-LinkedIn-accessToken1": {
+      "main": [
+        [
+          {
+            "node": "Article post",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Unable to get LinkedIn access token",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "invoke Tool-Get-LinkedIn-accessToken2": {
+      "main": [
+        [
+          {
+            "node": "Register the Image",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Unable to get LinkedIn access token",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "invoke Tool-Get-LinkedIn-accessToken3": {
+      "main": [
+        [
+          {
+            "node": "Register the Video",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Unable to get LinkedIn access token",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Start execution": {
+      "main": [
+        [
+          {
+            "node": "Prepare payload for TOOL-LogEvent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Invoke TOOL-LogEvent": {
+      "main": [
+        [
+          {
+            "node": "No Operation, do nothing1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Prepare payload for TOOL-LogEvent": {
+      "main": [
+        [
+          {
+            "node": "Invoke TOOL-LogEvent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Incorrect post type1": {
+      "main": [
+        [
+          {
+            "node": "Prepare payload for TOOL-LogEvent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Incorrect request payload4": {
+      "main": [
+        [
+          {
+            "node": "Prepare payload for TOOL-LogEvent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Unable to get LinkedIn access token": {
+      "main": [
+        [
+          {
+            "node": "Prepare payload for TOOL-LogEvent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Unable to post the text/article or unable to register image/video": {
+      "main": [
+        [
+          {
+            "node": "Prepare payload for TOOL-LogEvent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Unable to get image/video": {
+      "main": [
+        [
+          {
+            "node": "Prepare payload for TOOL-LogEvent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Unable to upload image/video": {
+      "main": [
+        [
+          {
+            "node": "Prepare payload for TOOL-LogEvent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Unable to post image/video": {
+      "main": [
+        [
+          {
+            "node": "Prepare payload for TOOL-LogEvent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Post created Successfully": {
+      "main": [
+        [
+          {
+            "node": "Prepare payload for TOOL-LogEvent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Incorrect post type": {
+      "main": [
+        [
+          {
+            "node": "Incorrect post type1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Incorrect request payload3": {
+      "main": [
+        [
+          {
+            "node": "Incorrect request payload4",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Incorrect request payload2": {
+      "main": [
+        [
+          {
+            "node": "Incorrect request payload4",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Incorrect request payload1": {
+      "main": [
+        [
+          {
+            "node": "Incorrect request payload4",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Incorrect request payload": {
+      "main": [
+        [
+          {
+            "node": "Incorrect request payload4",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Unable to get Own Company LinkedIn details": {
+      "main": [
+        [
+          {
+            "node": "Prepare payload for TOOL-LogEvent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Article post created successfully": {
+      "main": [
+        [
+          {
+            "node": "Post created Successfully",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Text post created successfully": {
+      "main": [
+        [
+          {
+            "node": "Post created Successfully",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Image post created successfully": {
+      "main": [
+        [
+          {
+            "node": "Post created Successfully",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Video post created successfully": {
+      "main": [
+        [
+          {
+            "node": "Post created Successfully",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If": {
+      "main": [
+        [
+          {
+            "node": "Text post created successfully1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "67cebb94-1f33-4a24-bce4-e36252839410",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "cdb933c56d4d2fd569a441b2b7966e0e27d761306d8926e1440759978db55554"
+  },
+  "id": "ZV7Q13PhFKbsiztr",
+  "tags": [
+    {
+      "updatedAt": "2025-10-29T13:28:02.108Z",
+      "createdAt": "2025-10-29T13:28:02.108Z",
+      "id": "8zaoedr4dAouyRw8",
+      "name": "Webhook"
+    }
+  ]
+}
